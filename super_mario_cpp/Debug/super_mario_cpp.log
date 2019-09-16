@@ -1,2 +1,3 @@
-﻿  ApplyVelocityToPositionSystem.cpp
-  super_mario_cpp.vcxproj -> E:\Projects\Cpp\super_mario_cpp\Debug\super_mario_cpp.exe
+﻿  Main.cpp
+E:\Projects\Cpp\super-mario-ecs-cpp\super_mario_cpp\Main.cpp(114,33): warning C4305:  'initializing': truncation from 'IMG_InitFlags' to 'bool'
+  super_mario_cpp.vcxproj -> E:\Projects\Cpp\super-mario-ecs-cpp\Debug\super_mario_cpp.exe

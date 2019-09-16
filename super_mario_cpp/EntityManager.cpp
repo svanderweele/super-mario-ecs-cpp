@@ -45,13 +45,23 @@ void EntityManager::DestroyEntity(Entity *entity) {
 	entity = nullptr;
 }
 
-bool EntityManager::AddComponentToEntity(Entity *entity, Component *component) {
+Component *EntityManager::AddComponentToEntity(Entity *entity, Component *component) {
+	if (entity == NULL) {
+		printf("Entity is null!");
+		return nullptr;
+	}
+
 	int startIndex = GetComponentIndexById(component->GetComponentId());
 	mComponents.insert(mComponents.begin() + startIndex + entity->GetId(), component);
-	return true;
+	return component;
 }
 
 bool EntityManager::RemoveComponentFromEntity(Entity *entity, Component *component) {
+	if (entity == NULL) {
+		printf("Entity is null!");
+		return false;
+	}
+
 	int startIndex = GetComponentIndexById(component->GetComponentId());
 	mComponents.erase(mComponents.begin() + startIndex + entity->GetId());
 	return true;
@@ -59,6 +69,12 @@ bool EntityManager::RemoveComponentFromEntity(Entity *entity, Component *compone
 
 
 Component *EntityManager::GetComponentFromEntity(Entity *entity, EComponentId componentId) {
+	if (entity == NULL) {
+		printf("Entity is null!");
+		return false;
+	}
+
+
 	int startIndex = GetComponentIndexById(componentId);
 	return mComponents[std::distance(mComponents.begin(), mComponents.begin() + startIndex + entity->GetId())];
 }

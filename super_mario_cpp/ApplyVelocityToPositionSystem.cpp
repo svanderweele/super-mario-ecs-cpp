@@ -10,7 +10,7 @@ void ApplyVelocityToPositionSystem::update() {
 	for (Entity *entity : entities) {
 		TransformComponent *transform = (TransformComponent *)GetEntityManager()->GetComponentFromEntity(entity, COMPONENT_ID_TRANSFORM);
 		VelocityComponent *velocity = (VelocityComponent *)GetEntityManager()->GetComponentFromEntity(entity, COMPONENT_ID_VELOCITY);
-		transform->mX += velocity->mX;
-		transform->mY += velocity->mY;
+		transform->y += velocity->x;
+		transform->y += velocity->y;
 	}
 }

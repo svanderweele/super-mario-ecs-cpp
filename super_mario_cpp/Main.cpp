@@ -1,51 +1,125 @@
 #include "Main.h"
+
+//Core
+#include <SDL.h>
+#include <SDL_image.h>
+
+//ECS
 #include "EntityManager.h"
 #include "Entity.h"
 #include "Component.h"
+
+//Components
+#include "SpriteComponent.h"
+#include "AnimationComponent.h"
+
+//Systems
 #include "ApplyVelocityToPositionSystem.h"
+#include "RenderSpriteSystem.h"
+#include "UpdateAnimationSystem.h"
 
+//Utilities
+#include "Texture.h"
+
+
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 int Main::EntityIndex = 0;
-EntityManager entityManager;
 
-void tryGetEntity(int id);
+EntityManager entityManager;
+SDL_Window *gWindow;
+SDL_Renderer *gRenderer;
+
+bool initSdl();
+SDL_Rect GetClipByIndex(int index, int w, int h, int xOffset);
 
 
 int main(int argc, char *argv[]) {
-	entityManager = EntityManager();
 
-	for (int i = 0; i < 5; i++) {
-		Entity *e = entityManager.CreateEntity();
-		printf("Entity Created with ID: %u \n", e->GetId());
-	}
+	if (initSdl()) {
 
-	tryGetEntity(5);
+		entityManager = EntityManager();
 
-	Entity *entity = entityManager.GetEntityWithId(3);
-	entityManager.AddComponentToEntity(entity, new TransformComponent(5, 3));
-	entityManager.AddComponentToEntity(entity, new VelocityComponent(5, 3));
+		entityManager.RegisterSystem(new ApplyVelocityToPositionSystem());
+		entityManager.RegisterSystem(new RenderSpriteSystem(gRenderer));
+		entityManager.RegisterSystem(new UpdateAnimationSystem());
 
-	TransformComponent *component = (TransformComponent *)entityManager.GetComponentFromEntity(entity, COMPONENT_ID_TRANSFORM);
+		entityManager.CreateEntity();
+		Entity *mario = entityManager.GetEntityWithId(0);
+		entityManager.AddComponentToEntity(mario, new TransformComponent(320, 240));
 
-	if (component) {
-		std::cout << *component << std::endl;
-	}
+		Texture *marioTexture = new Texture();
+		marioTexture->loadTextureFromImage(gRenderer, "Content/Sprites/mario_walk.png", 0, 0xFF, 0);
+		SpriteComponent *spriteComponent = (SpriteComponent *)entityManager.AddComponentToEntity(mario, new SpriteComponent(marioTexture));
 
-	std::vector<Entity *> entities = entityManager.GetEntitiesWithComponents({ COMPONENT_ID_TRANSFORM, COMPONENT_ID_VELOCITY });
-	std::cout << "Entities with those components " << entities.size() << std::endl;
+		std::vector<SDL_Rect> idleClips = std::vector<SDL_Rect>(1);
+		idleClips[0] = GetClipByIndex(10, 27, 16, 6);
 
-	entityManager.RegisterSystem(new ApplyVelocityToPositionSystem());
+		std::vector<SDL_Rect> runClips = std::vector<SDL_Rect>(2);
+		runClips[0] = { 0, 0, 16, 24 };
+		runClips[1] = { 17, 0, 16, 24 };
 
-	while (true)
-	{
-		entityManager.UpdateSystems();
+		entityManager.AddComponentToEntity(mario, new AnimationComponent(runClips, 0, runClips.size()));
+
+		SDL_Event e;
+		while (true)
+		{
+			while (SDL_PollEvent(&e)) {
+				if (e.type == SDL_KEYDOWN) {
+					switch (e.key.keysym.sym) {
+					case SDLK_a:
+						spriteComponent->direction = 1;
+						break;
+					case SDLK_d:
+						spriteComponent->direction = -1;
+						break;
+					}
+				}
+			}
+			entityManager.UpdateSystems();
+		}
 	}
 
 	return 0;
 }
 
-void tryGetEntity(int id) {
-	Entity *entity = entityManager.GetEntityWithId(id);
-	if (entity == nullptr) {
-		printf("Entity %u not found! \n", id);
-	}
+SDL_Rect GetClipByIndex(int index, int w, int h, int xOffset) {
+	SDL_Rect rect;
+	rect.x = (w + xOffset) * index;
+	rect.y = 0;
+	rect.w = w;
+	rect.h = h;
+	return rect;
 }
+
+
+bool initSdl() {
+	bool success = true;
+
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	}
+	else {
+		gWindow = SDL_CreateWindow("Super Mario Bros Cpp :: ECS", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+		if (gWindow == NULL) {
+			printf("Window could not be created! SDL_Error:%s\n", SDL_GetError());
+			success = false;
+		}
+		else {
+			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+			if (gRenderer == NULL) {
+				printf("Renderer could not be created! SDL_Error:%s\n", SDL_GetError());
+				success = false;
+			}
+			else {
+				bool imgFlags = IMG_INIT_PNG;
+				if (!(IMG_Init(imgFlags) && imgFlags)) {
+					printf("IMG could not be initialize! IMG_Error:%s\n", IMG_GetError());
+					success = false;
+				}
+			}
+		}
+	}
+
+	return success;
+}
+

@@ -18,7 +18,7 @@ public:
 	void DestroyEntity(Entity *entity);
 
 	//Components
-	bool AddComponentToEntity(Entity *entity, Component *component);
+	Component* AddComponentToEntity(Entity *entity, Component *component);
 	bool RemoveComponentFromEntity(Entity *entity, Component *component);
 	Component *GetComponentFromEntity(Entity *entity, EComponentId componentId);
 	std::vector<Entity *>GetEntitiesWithComponents(std::initializer_list<EComponentId> componentIds);

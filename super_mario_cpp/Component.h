@@ -5,6 +5,8 @@
 enum EComponentId {
 	COMPONENT_ID_TRANSFORM,
 	COMPONENT_ID_VELOCITY,
+	COMPONENT_ID_SPRITE,
+	COMPONENT_ID_ANIMATION,
 	COMPONENT_ID_TOTALCOMPONENTS
 };
 
@@ -26,17 +28,17 @@ class TransformComponent : public Component {
 
 public:
 	virtual EComponentId GetComponentId() override { return COMPONENT_ID_TRANSFORM; };
-	TransformComponent(float x, float y) { mX = x; mY = y; }
+	TransformComponent(float x, float y) { this->x = x; this->y = y; }
 
 public:
-	float mX;
-	float mY;
+	float x;
+	float y;
 
 };
 
 
 inline std::ostream &operator<<(std::ostream &Str, TransformComponent const &v) {
-	Str << "TransformComponent: X:" << v.mX << " Y:" << v.mY;
+	Str << "TransformComponent: X:" << v.x << " Y:" << v.y;
 	return Str;
 }
 
@@ -45,15 +47,15 @@ class VelocityComponent : public Component {
 
 public:
 	virtual EComponentId GetComponentId() override { return COMPONENT_ID_VELOCITY; };
-	VelocityComponent(float x, float y) { mX = x; mY = y; }
+	VelocityComponent(float x, float y) { this->x = x; this->y = y; }
 
 public:
-	float mX;
-	float mY;
+	float x;
+	float y;
 };
 
 
 inline std::ostream &operator<<(std::ostream &Str, VelocityComponent const &v) {
-	Str << "VelocityComponent: X:" << v.mX << " Y:" << v.mY;
+	Str << "VelocityComponent: X:" << v.x << " Y:" << v.y;
 	return Str;
 }
