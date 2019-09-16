@@ -1,3 +1,2 @@
-﻿  Main.cpp
-E:\Projects\Cpp\super-mario-ecs-cpp\super_mario_cpp\Main.cpp(114,33): warning C4305:  'initializing': truncation from 'IMG_InitFlags' to 'bool'
+﻿  PlayerInputSystem.cpp
   super_mario_cpp.vcxproj -> E:\Projects\Cpp\super-mario-ecs-cpp\Debug\super_mario_cpp.exe

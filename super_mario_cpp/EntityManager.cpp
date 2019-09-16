@@ -5,11 +5,11 @@
 #include "Component.h"
 #include "System.h"
 
-const int MAX_COMPONENTS_PER_TYPE = 100;
+const int MAX_COMPONENTS_PER_TYPE = 5;
 
 
 EntityManager::EntityManager() {
-	mComponents.resize(COMPONENT_ID_TOTALCOMPONENTS * MAX_COMPONENTS_PER_TYPE);
+	mComponents.resize((COMPONENT_ID_TOTALCOMPONENTS+1) * MAX_COMPONENTS_PER_TYPE);
 }
 
 
@@ -52,7 +52,9 @@ Component *EntityManager::AddComponentToEntity(Entity *entity, Component *compon
 	}
 
 	int startIndex = GetComponentIndexById(component->GetComponentId());
-	mComponents.insert(mComponents.begin() + startIndex + entity->GetId(), component);
+
+	printf("Added Component! %u = %u\n",startIndex + entity->GetId());
+	mComponents[startIndex + entity->GetId()] = component;
 	return component;
 }
 
@@ -63,7 +65,7 @@ bool EntityManager::RemoveComponentFromEntity(Entity *entity, Component *compone
 	}
 
 	int startIndex = GetComponentIndexById(component->GetComponentId());
-	mComponents.erase(mComponents.begin() + startIndex + entity->GetId());
+	mComponents[startIndex + entity->GetId()] = nullptr;
 	return true;
 }
 
@@ -76,7 +78,7 @@ Component *EntityManager::GetComponentFromEntity(Entity *entity, EComponentId co
 
 
 	int startIndex = GetComponentIndexById(componentId);
-	return mComponents[std::distance(mComponents.begin(), mComponents.begin() + startIndex + entity->GetId())];
+	return mComponents[startIndex + entity->GetId()];
 }
 
 std::vector<Entity *> EntityManager::GetEntitiesWithComponents(std::initializer_list<EComponentId> componentIds) {

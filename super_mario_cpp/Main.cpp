@@ -11,12 +11,15 @@
 
 //Components
 #include "SpriteComponent.h"
+#include "PlayerComponent.h"
 #include "AnimationComponent.h"
 
 //Systems
 #include "ApplyVelocityToPositionSystem.h"
 #include "RenderSpriteSystem.h"
 #include "UpdateAnimationSystem.h"
+#include "SetSpriteToFaceMovingDirectionSystem.h"
+#include "PlayerInputSystem.h"
 
 //Utilities
 #include "Texture.h"
@@ -40,13 +43,17 @@ int main(int argc, char *argv[]) {
 
 		entityManager = EntityManager();
 
-		entityManager.RegisterSystem(new ApplyVelocityToPositionSystem());
 		entityManager.RegisterSystem(new RenderSpriteSystem(gRenderer));
 		entityManager.RegisterSystem(new UpdateAnimationSystem());
+		entityManager.RegisterSystem(new PlayerInputSystem());
+		entityManager.RegisterSystem(new ApplyVelocityToPositionSystem());
+		entityManager.RegisterSystem(new SetSpriteToFaceMovingDirectionSystem());
 
 		entityManager.CreateEntity();
 		Entity *mario = entityManager.GetEntityWithId(0);
 		entityManager.AddComponentToEntity(mario, new TransformComponent(320, 240));
+		entityManager.AddComponentToEntity(mario, new VelocityComponent(0, 0));
+		entityManager.AddComponentToEntity(mario, new PlayerComponent());
 
 		Texture *marioTexture = new Texture();
 		marioTexture->loadTextureFromImage(gRenderer, "Content/Sprites/mario_walk.png", 0, 0xFF, 0);
@@ -61,24 +68,20 @@ int main(int argc, char *argv[]) {
 
 		entityManager.AddComponentToEntity(mario, new AnimationComponent(runClips, 0, runClips.size()));
 
+		bool bIsQuit = false;
 		SDL_Event e;
-		while (true)
+		while (!bIsQuit)
 		{
 			while (SDL_PollEvent(&e)) {
-				if (e.type == SDL_KEYDOWN) {
-					switch (e.key.keysym.sym) {
-					case SDLK_a:
-						spriteComponent->direction = 1;
-						break;
-					case SDLK_d:
-						spriteComponent->direction = -1;
-						break;
-					}
+				if (e.type == SDL_QUIT) {
+					bIsQuit = true;
 				}
 			}
 			entityManager.UpdateSystems();
 		}
 	}
+
+	SDL_Delay(20000);
 
 	return 0;
 }
